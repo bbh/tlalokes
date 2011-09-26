@@ -2,7 +2,6 @@
 $c = array();
 // Default
 $c['default']['controller'] = 'example';
-$c['default']['action'] = 'get_data_from_db';
 $c['default']['locale'] = 'eng';
 $c['default']['charset'] = 'utf8';
 $c['default']['timezone'] = 'America/Monterrey';
