@@ -239,16 +239,26 @@ function tf_view_load ()
 
     $path = tf_conf_get('application_path') . '/view/';
 
-    $file = $annotation['Action']['file'].'.php';
+    $file = tf_conf_get('controller').'_'.$annotation['Action']['file'].'.php';
 
-    if ( !file_exists( $path . $file ) ) {
+    if ( !file_exists( $path.$file ) ) {
 
-      $file = $annotation['Action']['file'].'.tpl';
+      $file = tf_conf_get('controller').'_'.$annotation['Action']['file'].'.tpl';
 
-      if ( !file_exists( $path . $file ) ) {
+      if ( !file_exists( $path.$file ) ) {
 
-        tf_error( '[Framework][Template] File not found ('.
-                  $annotation['Action']['file'] .')', true );
+        $file = $annotation['Action']['file'].'.php';
+
+        if ( !file_exists( $path . $file ) ) {
+
+          $file = $annotation['Action']['file'].'.tpl';
+
+          if ( !file_exists( $path . $file ) ) {
+
+            tf_error( '[Framework][Template] File not found ('.
+                      $annotation['Action']['file'] .')', true );
+          }
+        }
       }
     }
 
@@ -260,24 +270,36 @@ function tf_view_load ()
 
     $path = tf_conf_get('application_path') . '/view/layout/';
 
-    $file = $annotation['Action']['layout'].'_layout.php';
+    $file = tf_conf_get('controller').'_'.$annotation['Action']['layout'].
+            '_layout.php';
 
-    if ( !file_exists( $path.$file ) ) {
+    if ( file_exists( $path.$file ) ) {
 
-      $file = $annotation['Action']['layout'].'_layout.tpl';
+      $file = tf_conf_get('controller').'_'.$annotation['Action']['layout'].
+              '_layout.tpl';
 
-      if ( !file_exists( $path.$file ) ) {
+      if ( file_exists( $path.$file ) ) {
 
-        $file = $annotation['Action']['layout'].'.php';
+        $file = $annotation['Action']['layout'].'_layout.php';
 
         if ( !file_exists( $path.$file ) ) {
 
-          $file = $annotation['Action']['layout'].'.tpl';
+          $file = $annotation['Action']['layout'].'_layout.tpl';
 
           if ( !file_exists( $path.$file ) ) {
 
-            tf_error( '[Framework][Layout] File not found ('.
-                      $annotation['Action']['layout'] .')', true );
+            $file = $annotation['Action']['layout'].'.php';
+
+            if ( !file_exists( $path.$file ) ) {
+
+              $file = $annotation['Action']['layout'].'.tpl';
+
+              if ( !file_exists( $path.$file ) ) {
+
+                tf_error( '[Framework][Layout] File not found ('.
+                          $annotation['Action']['layout'] .')', true );
+              }
+            }
           }
         }
       }
@@ -349,7 +371,7 @@ function tf_db ( $dsn_name = 'default' )
  * @param string $name Name of the variable
  * @return mixed The value from response registry
  */
-function tf_response_get ( $name )
+function tf_response ( $name )
 {
   if ( !isset( $GLOBALS['_REGISTRY']['response'] ) ) {
 
@@ -388,16 +410,21 @@ function tf_response_set ( $name, $value )
  */
 function tf_controller_load ()
 {
+  // transform controller name from this_example to ThisExample
   $name = tf_strlow_to_camel( tf_conf_get( 'controller' ) ) . 'Ctl';
 
+  // set absolute path to check file
   $path = tf_conf_get( 'application_path' ) . '/controller/' . $name . '.php';
 
+  // validate file existance
   if ( !file_exists( $path ) ) {
 
     tf_error( "[Framework] Controller ($name) not found", true );
   }
 
+  // load controller
   require $path;
+
   unset( $path );
 
   tf_log( "Controller: ($name) loaded" );
@@ -419,10 +446,11 @@ function tf_controller_load ()
     }
   }
 
+  // set annotation to configuration
   if ( isset( $annotation ) && is_array( $annotation ) ) {
 
     tf_conf_set( 'controller_annotation', $annotation );
-    unset( $annotation );
+
     unset( $doc );
 
     tf_log( "Controller: Annotations loaded" );
@@ -431,8 +459,17 @@ function tf_controller_load ()
   // load action
   if ( !$action = tf_request( 'action' ) ) {
 
-    tf_error( "[Framework] Action name required", true );
+    // check default action
+    if ( !isset( $annotation['Controller']['default'] ) ) {
+
+      tf_error( "[Framework] Action name required", true );
+    }
+
+    // set default action
+    $action = $annotation['Controller']['default'];
   }
+
+  unset( $annotation );
 
   // validate action existance
   if ( !$reflection->hasMethod( $action ) ) {
