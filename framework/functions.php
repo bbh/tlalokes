@@ -10,6 +10,9 @@
  */
 function tf_init ( $htdocs, $application = false )
 {
+  // init session
+  session_start();
+
   // set registry global
   $GLOBALS['_REGISTRY'] = array();
 
@@ -36,37 +39,41 @@ function tf_init ( $htdocs, $application = false )
     // check if there is an argument to load
     if ( !isset( $_SERVER['argv'][1] ) || !$_SERVER['argv'][1] ) {
 
-      tf_error( "[Framework] Provide arguments", true );
+      tf_error( "[Framework] Provide arguments" );
     }
 
-    // parse arguments
-    $arguments = explode( '&', $_SERVER['argv'][1] );
+    if ( isset( $_SERVER['argv'][1] ) ) {
 
-    if ( count( $arguments ) > 1 ) {
+      // parse arguments
+      $arguments = explode( '&', $_SERVER['argv'][1] );
 
-      foreach ( $arguments as $value ) {
+      if ( count( $arguments ) > 1 ) {
 
-        $var = explode( '=', $value );
+        foreach ( $arguments as $value ) {
+
+          $var = explode( '=', $value );
+
+          $GLOBALS['_REGISTRY']['request'][$var[0]] = $var[1];
+
+          unset( $var );
+        }
+
+      } else {
+
+        $var = explode( '=', $arguments[0] );
+
+        if ( !isset( $var[1] ) || !$var[1] ) {
+
+          tf_error( "[Framework] Provide a value in your argument", true );
+        }
 
         $GLOBALS['_REGISTRY']['request'][$var[0]] = $var[1];
 
         unset( $var );
       }
 
-    } else {
-
-      $var = explode( '=', $arguments[0] );
-
-      if ( !isset( $var[1] ) || !$var[1] ) {
-
-        tf_error( "[Framework] Provide a value in your argument", true );
-      }
-
-      $GLOBALS['_REGISTRY']['request'][$var[0]] = $var[1];
-
-      unset( $var );
+      unset( $arguments );
     }
-    unset( $arguments );
 
   // application is web based
   } else {
@@ -107,7 +114,11 @@ function tf_init ( $htdocs, $application = false )
   // load controller
   if ( !$controller = tf_request( 'controller' ) ) {
 
-    tf_error( "[Framework] Controller name required", true );
+    // load default controller
+    if ( !$controller = tf_conf_get( 'default', 'controller' ) ) {
+
+      tf_error( "[Framework] Controller name required", true );
+    }
   }
 
   tf_conf_set( 'controller', $controller );
@@ -204,9 +215,14 @@ function tf_view_zone ( $zone_name )
  * @author Basilio Briceno <bbh@tlalokes.org>
  * @copyright Copyright (c) 2011, Basilio Briceno
  * @license http://www.gnu.org/licenses/lgpl.html GNU LGPL
+ * @todo SET URI TO RESPONSE
  */
 function tf_view_load ()
 {
+  // set short open tags <? as default
+  ini_set( 'short_open_tag', '1' );
+
+  // get action's annotations
   $annotation = tf_conf_get( 'action_annotation' );
 
   if ( !isset( $annotation['Action']['file'] ) &&
@@ -271,6 +287,8 @@ function tf_view_load ()
   }
 
   unset( $annotation );
+
+  // set URI
 
   require $path.$file;
 
