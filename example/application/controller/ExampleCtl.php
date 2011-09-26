@@ -4,7 +4,7 @@
  * Example class to ilustrate how Tlalokes 2 works
  *
  * @author Basilio Briceno <bbh@tlalokes.org>
- * @Controller( output='CLI' )
+ * @Controller( output='CLI', default='helloWorld' )
  */
 class ExampleCtl {
 
@@ -12,12 +12,11 @@ class ExampleCtl {
    * Hello world example method
    *
    * @author Basilio Briceno <bbh@tlalokes.org>
-   * @Action( layout='example', block='content:hello' )
+   * @Action( file='hello' )
    */
   public function helloWorld ()
   {
-    print_r( tf_conf_get( 'action_annotation' ) );
-    tf_response_set( 'hello_world', 'Hola Mundo' );
+    tf_response_set( 'hello_world', 'Hello World' );
   }
 
   /**
