@@ -2,3 +2,4 @@ Locale support
 Mailer support
 Authentication/Permissions
 Upload managment
+Memcached integration
