@@ -292,7 +292,7 @@ function tf_rmdir ( $path )
 function tf_crypt ( $string, $code = false )
 {
   return crypt( $string,
-                '$6$rounds=5000$'.( $code ? $code : md5('53.k0141t') ).'$' );
+                '$6$rounds=5000$'.($code ? $code : '35332e6b3031343174').'$' );
 }
 
 /**
