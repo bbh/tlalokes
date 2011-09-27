@@ -145,6 +145,138 @@ function tf_init ( $htdocs, $application = false )
 }
 
 /**
+ * Transforms string to html entities and returns it as the required charset
+ *
+ * @author Basilio Briceno <bbh@tlalokes.org>
+ * @copyright Copyright (c) 2011, Basilio Briceno
+ * @license http://www.gnu.org/licenses/lgpl.html GNU LGPL
+ * @param string $string
+ * @param string $to charset name (UTF-8, ISO-8859-1, etc.) default UTF-8
+ * @return string
+ */
+function tf_charset ( $string, $to = 'UTF-8' )
+{
+  if ( is_string( $string ) ) {
+
+    // encode special chars as HTML entities
+    $string = htmlentities( $string, ENT_NOQUOTES, $to );
+
+    // decode HTML entities and return it as the specified charset
+    $string = html_entity_decode( $string, ENT_NOQUOTES, $to );
+  }
+
+  return $string;
+}
+
+/**
+ * Transforms an array into a string
+ *
+ * @author Basilio Briceno <bbh@tlalokes.org>
+ * @copyright Copyright (c) 2011, Basilio Briceno
+ * @license http://www.gnu.org/licenses/lgpl.html GNU LGPL
+ * @param mixed $element
+ * @param mixed $parent;
+ */
+function tf_array_to_string ( $element, $parent = false )
+{
+  $response = '';
+
+  if ( is_array( $element ) ) {
+
+    foreach ( $element as $k => $v ) {
+
+      $parent = preg_replace( '/(\[\')*(.*)(\'\])*/', '$2', $parent );
+
+      $key = ( $parent ? "['$parent']" : '' ) . "['$k']";
+
+      $response .= tf_array_to_string( $v, $key );
+    }
+
+  } else {
+
+    $response .= str_replace( "']']", "']", $parent )." = '$element';\n";
+  }
+
+  return $response;
+}
+
+/**
+ * Removes characters cosidered part of an injection attack
+ *
+ * @author Basilio Briceno <bbh@tlalokes.org>
+ * @copyright Copyright (c) 2011, Basilio Briceno
+ * @license http://www.gnu.org/licenses/lgpl.html GNU LGPL
+ * @param string $string
+ * @return string
+ */
+function tf_sanitize ( $string )
+{
+  // remove double backslash
+  $string = str_replace( '\\', '', $string );
+
+  // remove \t & \n from ^ and $
+  $string = trim( $string );
+
+  //$string = quotemeta( trim( $string ) );
+
+  // add slash to quotes
+  return addslashes( $string );
+}
+
+/**
+ * Removes a directory in a recursive way
+ *
+ * @author Basilio Briceno <bbh@tlalokes.org>
+ * @copyright Copyright (c) 2011, Basilio Briceno
+ * @license http://www.gnu.org/licenses/lgpl.html GNU LGPL
+ * @param string $path
+ */
+function tf_rmdir ( $path )
+{
+  if ( !file_exists( $path ) ) {
+    tlalokes_error_msg( 'Directory provided not existant' );
+  }
+
+  if ( !is_writable( $path ) ) {
+    tlalokes_error_msg( "Directory or file isn't writeable" );
+  }
+
+  // check if $path is directory or file
+  if ( is_dir( $path ) ) {
+
+    // iterate $path directory
+    foreach ( glob( $path . '/*' ) as $item ) {
+
+      // recursive call content in $item
+      tf_rmdir( $item );
+    }
+
+    // remove directory $path
+    rmdir( $path );
+
+  } else {
+
+    // remove file $path
+    unlink( $path );
+  }
+}
+
+/**
+ * Crypts in a 'one way' mode a string provided using SHA512 with 5000 rounds
+ *
+ * @author Basilio Briceno <bbh@tlalokes.org>
+ * @copyright Copyright (c) 2011, Basilio Briceno
+ * @license http://www.gnu.org/licenses/lgpl.html GNU LGPL
+ * @param string $string String to crypt
+ * @param string $code Application's code for salt
+ */
+function tf_crypt ( $string, $code = false )
+{
+  return crypt( $string,
+                '$6$rounds=5000$'.( $code ? $code : md5('53.k0141t') ).'$' );
+}
+
+/**
  * Loads a zone's block
  *
  * @author Basilio Briceno <bbh@tlalokes.org>
