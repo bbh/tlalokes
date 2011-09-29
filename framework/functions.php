@@ -49,55 +49,14 @@ function tf_init ( $htdocs, $application = false )
   // if application is CLI based parse request vars from argv
   if ( PHP_SAPI == 'cli' ) {
 
-    // check if argv is On in php.ini
-    if ( ini_get('register_argc_argv') != 1 ) {
-
-      tf_error( "[Framework] Set 'register_argc_argv=On' in php.ini", true );
-    }
-
-    // check if there is an argument to load
-    if ( !isset( $_SERVER['argv'][1] ) || !$_SERVER['argv'][1] ) {
-
-      tf_error( "[Framework] Provide arguments" );
-    }
-
-    if ( isset( $_SERVER['argv'][1] ) ) {
-
-      // parse arguments
-      $arguments = explode( '&', $_SERVER['argv'][1] );
-
-      if ( count( $arguments ) > 1 ) {
-
-        foreach ( $arguments as $value ) {
-
-          $var = explode( '=', $value );
-
-          $GLOBALS['_REGISTRY']['request'][$var[0]] = $var[1];
-
-          unset( $var );
-        }
-
-      } else {
-
-        $var = explode( '=', $arguments[0] );
-
-        if ( !isset( $var[1] ) || !$var[1] ) {
-
-          tf_error( "[Framework] Provide a value in your argument", true );
-        }
-
-        $GLOBALS['_REGISTRY']['request'][$var[0]] = $var[1];
-
-        unset( $var );
-      }
-
-      unset( $arguments );
-    }
+    // parse arguments from CLI
+    tf_parse_argv();
 
   // application is web based
   } else {
 
     // load request
+    $GLOBALS['_REGISTRY']['request'] =& $_REQUEST;
   }
 
   tf_log( "Request: variables loaded" );
@@ -161,6 +120,61 @@ function tf_init ( $htdocs, $application = false )
   unset( $GLOBALS['_REGISTRY'] );
 
   exit;
+}
+
+/**
+ * Parses arguments from CLI from a "foo=1&bar=2" format and sets it as request
+ *
+ * @author Basilio Briceno <bbh@tlalokes.org>
+ * @copyright Copyright (c) 2011, Basilio Briceno
+ * @license http://www.gnu.org/licenses/lgpl.html GNU LGPL
+ */
+function tf_parse_argv ()
+{
+  // check if argv is On in php.ini
+  if ( ini_get('register_argc_argv') != 1 ) {
+
+    tf_error( "[Framework] Set 'register_argc_argv=On' in php.ini", true );
+  }
+
+  // check if there is an argument to load
+  if ( !isset( $_SERVER['argv'][1] ) || !$_SERVER['argv'][1] ) {
+
+    tf_error( "[Framework] Provide arguments" );
+  }
+
+  if ( isset( $_SERVER['argv'][1] ) ) {
+
+    // parse arguments
+    $arguments = explode( '&', $_SERVER['argv'][1] );
+
+    if ( count( $arguments ) > 1 ) {
+
+      foreach ( $arguments as $value ) {
+
+        $var = explode( '=', $value );
+
+        $GLOBALS['_REGISTRY']['request'][$var[0]] = $var[1];
+
+        unset( $var );
+      }
+
+    } else {
+
+      $var = explode( '=', $arguments[0] );
+
+      if ( !isset( $var[1] ) || !$var[1] ) {
+
+        tf_error( "[Framework] Provide a value in your argument", true );
+      }
+
+      $GLOBALS['_REGISTRY']['request'][$var[0]] = $var[1];
+
+      unset( $var );
+    }
+
+    unset( $arguments );
+  }
 }
 
 /**
