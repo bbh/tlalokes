@@ -438,12 +438,12 @@ function tf_view_load ()
     $file = tf_conf_get('controller').'_'.$annotation['Action']['layout'].
             '_layout.php';
 
-    if ( file_exists( $path.$file ) ) {
+    if ( !file_exists( $path.$file ) ) {
 
       $file = tf_conf_get('controller').'_'.$annotation['Action']['layout'].
               '_layout.tpl';
 
-      if ( file_exists( $path.$file ) ) {
+      if ( !file_exists( $path.$file ) ) {
 
         $file = $annotation['Action']['layout'].'_layout.php';
 
