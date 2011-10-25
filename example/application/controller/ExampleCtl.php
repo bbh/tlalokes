@@ -1,18 +1,15 @@
 <?php
-
 /**
- * Example class to ilustrate how Tlalokes 2 works
+ * Example to ilustrate how Tlalokes 2 works
  *
- * @author Basilio Briceno <bbh@tlalokes.org>
- * @Controller( output='CLI', default='helloWorld' )
+ * @Controller( default='helloWorld' )
  */
 class ExampleCtl {
 
   /**
-   * Hello world example method
+   * Action displays Hello World in a Template based View
    *
-   * @author Basilio Briceno <bbh@tlalokes.org>
-   * @Action( file='hello' )
+   * @Action( file='example_hello' )
    */
   public function helloWorld ()
   {
@@ -20,26 +17,22 @@ class ExampleCtl {
   }
 
   /**
-   * Another example method
+   * Actions displays data from an example database in a Layout based View
    *
-   * @author Basilio Briceno <bbh@tlalokes.org>
-   * @Action( layout='example', block='content:hello' )
-   */
-  public function sumThis ()
-  {
-    tf_response_set( 'result', tf_request('val1') + tf_request('val2') );
-  }
-
-  /**
-   * DB Connection example method
-   *
-   * @author Basilio Briceno <bbh@tlalokes.org>
-   * @Action( layout='example', zone='content:data,hello;foo:da,de' )
+   * @Action( layout='example', zone='content:data' )
    */
   public function getDataFromDB ( )
   {
     require 'ExampleBss.php';
 
     tf_response_set( 'example', ExampleBss::getData() );
+  }
+
+  /**
+   * A simple sum without View layer
+   */
+  public function sumThis ()
+  {
+    echo tf_request('val1') + tf_request('val2');
   }
 }
