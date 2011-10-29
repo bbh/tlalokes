@@ -36,3 +36,7 @@ IF SOMETHING GOES WRONG:
 WARNING
 
   2.0 alpha is a development version, right now is not for production.
+
+CREDITS
+
+  Thanks to Simon Martinez-Arriaga <simonm64@gmail.com> for the testing & fixes
