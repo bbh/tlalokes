@@ -538,7 +538,7 @@ function tf_db ( $dsn_name = 'default' )
  */
 function tf_response ( $name )
 {
-  if ( !isset( $GLOBALS['_REGISTRY']['response'] ) ) {
+  if ( !isset( $GLOBALS['_REGISTRY']['response'][$name] ) ) {
 
     return false;
   }
