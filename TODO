@@ -1,5 +1,4 @@
 Locale support (via gettext)
 Mailer support
 Authentication/Permissions
-Upload managment
 Memcached integration
