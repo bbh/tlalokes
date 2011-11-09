@@ -5,6 +5,7 @@ $c['default']['controller'] = 'example';
 $c['default']['locale'] = 'eng';
 $c['default']['charset'] = 'utf8';
 $c['default']['timezone'] = 'America/Monterrey';
+$c['default']['uploads'] = 'uploads/';
 // DSN
 $c['dsn']['default']['type'] = 'mysql';
 $c['dsn']['default']['host'] = 'localhost';
