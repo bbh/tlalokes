@@ -789,6 +789,19 @@ function tf_error ( $error_message, $force_die = false )
   }
 }
 
+function tf_app_error_set ( $error_message_id, $error_message )
+{
+  tf_log( '['.$error_message_id.'] '.$error_message );
+
+  $GLOBALS['_REGISTRY']['app_error'][$error_message_id] = $error_message;
+}
+
+function tf_app_error ( $error_message_id )
+{
+  return isset( $GLOBALS['_REGISTRY']['app_error'][$error_message_id] ) ?
+         $GLOBALS['_REGISTRY']['app_error'][$error_message_id] : false;
+}
+
 /**
  * Prints log registry if debug mode in on
  *
@@ -1001,4 +1014,173 @@ function tf_annotation_parser ( $doc )
   }
 
   return isset( $response ) ? $response : false;
+}
+
+/**
+ * Saves upload files from their temporal path to the configured one
+ *
+ * @author Basilio Briceno <bbh@tlalokes.org>
+ * @license http://www.gnu.org/licenses/lgpl.html GNU LGPL
+ * @param string $input_name If not set it will try to save everything in _FILES
+ * @param array $filter_rule Example: type => pdf, size => 1024
+ * @return boolean Returns TRUE if file saved, FALSE if error
+ */
+function tf_fileup_save ( $input_name = 'all', $filter_rule = false )
+{
+  $path = realpath( '.' ) .'/'. tf_conf_get( 'default', 'uploads' );
+
+  // check if _FILES contains an element
+  if ( count( $_FILES ) < 1 ) {
+
+    tf_error( '[Upload] No files to save' );
+
+    return false;
+
+  } else {
+
+    // save everything in _FILES
+    if ( $input_name == 'all' ) {
+
+      foreach ( $_FILES as $key => $file ) {
+
+        // check file size
+        if ( $file['size'] > 1 ) {
+
+          $save_flag = true;
+
+          if ( $filter_rule ) {
+
+            $save_flag = tf_fileup_filter( $key, $filter_rule );
+          }
+
+          if ( $save_flag ) {
+
+            // try to copy file to destination
+            if ( !@copy( $file['tmp_name'], $path.$file['name'] ) ) {
+
+              tf_error( '[Upload] Cannot write ('.$input_name.') into '.$path );
+            }
+
+            tf_log( 'Upload: File ('. $file['name'] .') written into '. $path );
+          }
+
+          unset( $save_flag );
+        }
+      }
+    }
+
+    // check file existance
+    if ( !isset( $_FILES[$input_name] ) ) {
+
+      tf_error( '[Upload] Required input ('.$input_name.') not found' );
+
+      return false;
+
+    } else {
+
+      // check file size
+      if ( $_FILES[$input_name]['size'] > 1 ) {
+
+        $save_flag = true;
+
+        if ( $filter_rule ) {
+
+          $save_flag = tf_fileup_filter( $input_name, $filter_rule );
+        }
+
+        if ( $save_flag ) {
+
+          // try to copy file to destination
+          if ( !@copy( $_FILES[$input_name]['tmp_name'],
+                       $path.$_FILES[$input_name]['name'] ) ) {
+
+            tf_error( '[Upload] Cannot write ('. $input_name .') into '.$path );
+
+            return false;
+          }
+
+          tf_log( 'Upload: File ('. $_FILES[$input_name]['name'] .
+                  ') written into '. $path );
+
+          return true;
+
+        } else {
+
+          return false;
+        }
+
+        unset( $save_flag );
+      }
+    }
+  }
+}
+
+/**
+ * Filters properties of a file upload
+ *
+ * @author Basilio Briceño <bbh@tlalokes.org>
+ * @license http://www.gnu.org/licenses/lgpl.html GNU LGPL
+ * @param string $input_name
+ * @param array $filter_rule Example: type => pdf, size => 1024
+ * @return boolean Return TRUE if file pass filter, FALSE if error
+ */
+function tf_fileup_filter ( $input_name, Array $filter_rule )
+{
+  // check type
+  if ( isset( $filter_rule['type'] ) ) {
+
+    list( $type, $format ) = explode( '/', $_FILES[$input_name]['type'] );
+
+    if ( $format != $filter_rule['type'] ) {
+
+      tf_app_error_set( 'Upload filter type', 'Invalid type ('.$format.')' );
+
+      return false;
+    }
+
+    unset( $type, $format );
+  }
+
+  // check size
+  if ( isset( $filter_rule['size'] ) ) {
+
+    if ( $_FILES[$input_name]['size'] > $filter_rule['size'] ) {
+
+      tf_app_error_set( 'Upload filter size', 'File size ('.
+                        round( $_FILES[$input_name]['size'] / 1024, 2 ) .
+                        'K) exceeds requirement' );
+
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
+ * Returns filename from input by name
+ *
+ * @author Basilio Briceño <bbh@tlalokes.org>
+ * @license http://www.gnu.org/licenses/lgpl.html GNU LGPL
+ * @param string $input_name
+ * @return mixed Filename string or FALSE if input doesn't exists
+ */
+function tf_fileup_getname ( $input_name )
+{
+  return isset( $_FILES[$input_name] ) ? $_FILES[$input_name]['name'] : false;
+}
+
+/**
+ * Prints the debug var for URIs if debug was set previously
+ *
+ * @author Basilio Briceño <bbh@tlalokes.org>
+ * @license http://www.gnu.org/licenses/lgpl.html GNU LGPL
+ */
+function tf_debug_var ()
+{
+  if ( isset( $GLOBALS['_REGISTRY']['request']['debug'] ) &&
+       $GLOBALS['_REGISTRY']['request']['debug'] ) {
+
+    echo '&debug=1';
+  }
 }
