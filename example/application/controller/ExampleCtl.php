@@ -35,4 +35,21 @@ class ExampleCtl {
   {
     echo tf_request('val1') + tf_request('val2');
   }
+
+  /**
+   * A single upload
+   *
+   * @Action( layout='example', zone='content:upload' )
+   */
+  public function uploadFile ()
+  {
+    if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
+
+      if ( tf_fileup_save( 'myfile', array( 'type' => 'pdf',
+                                         'size' => 160383 ) ) ) {
+
+        tf_response_set( 'flag', true );
+      }
+    }
+  }
 }
