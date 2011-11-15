@@ -34,7 +34,7 @@ DOCUMENTATION
 
  STRUCTURE
 
- When you check into the Tlalokes, you will see this structure
+ When you check into Tlalokes 2.0, you will see this structure
 
  + framework. Contains the frameworks required files.
  + example. Contains an example of the structure required to use the framework.
@@ -42,19 +42,19 @@ DOCUMENTATION
    |- css
    |- img
    |- js
-   \ application. This directory contains the structure of your application.
-    | controller. Contains the classes used as controllers.
-    \ model. Contains the files used as models.
-     |- business. Contains the files where the business logic must be allocated. 
-     |- vendor.
-    \ view. Contains the views files and structure.
-     |- layout. Contains the layouts files used to display a view
-     |- block. Contains the blocks for the layouts.
-    \ _misc.
-     |- locale.
-     |- lib.
-     |- sql.
-     |- tmp.
+  \ application. This directory contains the structure of your application.
+   | controller. Contains the classes used as controllers.
+   \ model. Contains the files used as models.
+    |- business. Contains the files where the business logic must be allocated. 
+    |- vendor.
+   \ view. Contains the views files and structure.
+    |- layout. Contains the layouts files used to display a view
+    |- block. Contains the blocks for the layouts.
+   \ _misc.
+    |- locale.
+    |- lib.
+    |- sql.
+    |- tmp.
 
 IF SOMETHING GOES WRONG:
 
