@@ -1129,16 +1129,31 @@ function tf_fileup_filter ( $input_name, Array $filter_rule )
   // check type
   if ( isset( $filter_rule['type'] ) ) {
 
-    list( $type, $format ) = explode( '/', $_FILES[$input_name]['type'] );
+    // iterate types to filter
+    foreach ( explode( ',', $filter_rule['type'] ) as $filter_type ) {
 
-    if ( $format != $filter_rule['type'] ) {
+      list( $type, $format ) = explode( '/', $_FILES[$input_name]['type'] );
 
-      tf_app_error_set( 'Upload filter type', 'Invalid type ('.$format.')' );
+      if ( $format != $filter_type ) {
 
-      return false;
+        $type_flag = false;
+
+        tf_app_error_set( 'Upload filter type', "Invalid type ($filter_type)" );
+
+        unset( $format );
+
+      } else {
+
+        $type_flag = true;
+        break;
+      }
+      unset( $type );
     }
 
-    unset( $type, $format );
+    if ( !$type_flag ) {
+      unset( $type_flag );
+      return false;
+    }
   }
 
   // check size
