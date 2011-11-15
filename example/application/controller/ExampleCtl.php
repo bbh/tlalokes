@@ -45,8 +45,8 @@ class ExampleCtl {
   {
     if ( $_SERVER['REQUEST_METHOD'] == 'POST' ) {
 
-      if ( tf_fileup_save( 'myfile', array( 'type' => 'pdf',
-                                         'size' => 160383 ) ) ) {
+      if ( tf_fileup_save( 'myfile', array( 'type' => 'jpeg,png',
+                                            'size' => 160383 ) ) ) {
 
         tf_response_set( 'flag', true );
       }
