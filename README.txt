@@ -1,5 +1,6 @@
                            Tlalokes Framework
                               Version 2.0s
+                           http://tlalokes.org
 
 Copyright (c) 2011 Basilio Briceno <bbh@tlalokes.org>
 
@@ -21,10 +22,9 @@ ON WHAT IT RUNS?
 
 REQUIREMENTS
 
-  PHP 5.3.x (do not uses namespaces, requires testing on 5.2.x)
   If you need database connections: use PDO binary extension installed (native driver recommended)
   If you require CLI execution: enable PHP CLI mode
-  Tested with Apache 2.x and Nginx
+  Tested on Apache 2.x and Nginx
 
 DOCUMENTATION
 
@@ -36,10 +36,11 @@ DOCUMENTATION
 
  When you check into Tlalokes 2.0, you will see this structure
 
- |- css
- |- img
- |- js
- \ app
+ |- css. Put your cascade style sheets in this directory.
+ |- img. Your application's images
+ |- js. For your javascripts
+ |- uploads. If using a UNIX-like OS, set write permissions to your web-server's user for this directory
+ \ app. IMPORTANT. We recommend to move your app directory to other NON-PUBLIC level in your filesystem
   | framework. Contains the frameworks required files.
   \ application. This directory contains the structure of your application.
    | controller. Contains the classes used as controllers.
