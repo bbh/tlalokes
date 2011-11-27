@@ -42,7 +42,8 @@ class TlalokesDBConnection extends PDO {
     return parent::__construct( $dsn['type'].':'.
                                 'host='.$dsn['host'].';'.
                                 'dbname='.$dsn['name'].';',
-                                $dsn['username'], $dsn['password'] );
+                                $dsn['username'], $dsn['password'],
+                                $dsn['options'] );
   }
 
   /**

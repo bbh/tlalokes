@@ -1,5 +1,5 @@
 <?php
-// this include must not exist on bin ext version
-include '/your_path_to/framework/functions.php';
+// this include is only for 2.0s version
+include 'app/framework/functions.php';
 
-tf_init( realpath('.') );
+tf_init();

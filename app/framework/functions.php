@@ -24,10 +24,9 @@
  * @author Basilio Briceno <bbh@tlalokes.org>
  * @copyright Copyright (c) 2011, Basilio Briceno
  * @license http://www.gnu.org/licenses/lgpl.html GNU LGPL
- * @param string $htdocs Path of public documents
  * @param string $application Application's path
  */
-function tf_init ( $htdocs, $application = false )
+function tf_init ( $application = false )
 {
   // init session
   session_start();
@@ -37,8 +36,7 @@ function tf_init ( $htdocs, $application = false )
 
   if ( !$application ) {
 
-    $application = preg_replace( '/(.*)\/[a-z0-9]*$/', '$1', $htdocs ) .'/'.
-                  'application';
+    $application = realpath( 'app/application' );
   }
 
   if ( !file_exists( $application ) ) {
@@ -64,24 +62,38 @@ function tf_init ( $htdocs, $application = false )
   // load configuration file
   if ( !file_exists( $application . '/config.php' ) ) {
 
-    tf_error( "[Framework] Configuration file not found", true );
+    tf_error( "[Framework] Application configuration file not found", true );
   }
 
   require $application . '/config.php';
 
+  // load theme name
+  $theme = tf_request( 'theme' ) ?
+           $application . '/view/theme/' . tf_request( 'theme' ) :
+           $application . '/view/theme/' . $c['default']['theme'];
+
+  // validate theme existance
+  if ( !file_exists( $theme ) ) {
+
+    tf_error( "[Framework] Theme ($theme) not found", true );
+  }
+
+  // set configuration in global registry
   $GLOBALS['_REGISTRY']['conf'] = $c;
-  unset( $c );
 
   // set include_path into environment
   ini_set( 'include_path', PATH_SEPARATOR . $application . '/controller' .
                            PATH_SEPARATOR . $application . '/model' .
                            PATH_SEPARATOR . $application . '/model/business' .
                            PATH_SEPARATOR . $application . '/view' .
+                           PATH_SEPARATOR . $theme .
                            PATH_SEPARATOR . $application . '/_misc/locale' .
                            PATH_SEPARATOR . $application . '/_misc/lib' );
 
-  tf_conf_set( 'application_path', $application );
-  unset( $application );
+  // set theme in configuration
+  $GLOBALS['_REGISTRY']['conf']['path']['application'] = $application;
+  $GLOBALS['_REGISTRY']['conf']['path']['theme'] = $theme;
+  unset( $c, $application, $theme );
 
   // set start time
   if ( isset( $GLOBALS['_REGISTRY']['request']['debug'] ) ) {
@@ -319,7 +331,7 @@ function tf_crypt ( $string, $code = false )
  */
 function tf_view_block ( $block_name )
 {
-  $path = tf_conf_get('application_path') . '/view/block/';
+  $path = tf_conf_get('path','theme') . '/block/';
 
   $file = tf_conf_get('controller').'_'.$block_name.'_block.php';
 
@@ -402,7 +414,7 @@ function tf_view_load ()
 
     tf_log( 'Template: Loading '.$annotation['Action']['file'] );
 
-    $path = tf_conf_get('application_path') . '/view/';
+    $path = tf_conf_get( 'path', 'theme' ) . '/';
 
     $file = tf_conf_get('controller').'_'.$annotation['Action']['file'].'.php';
 
@@ -433,7 +445,7 @@ function tf_view_load ()
   // load layout
   if ( isset( $annotation['Action']['layout'] ) ) {
 
-    $path = tf_conf_get('application_path') . '/view/layout/';
+    $path = tf_conf_get( 'path', 'theme' ) . '/layout/';
 
     $file = tf_conf_get('controller').'_'.$annotation['Action']['layout'].
             '_layout.php';
@@ -579,7 +591,7 @@ function tf_controller_load ()
   $name = tf_strlow_to_camel( tf_conf_get( 'controller' ) ) . 'Ctl';
 
   // set absolute path to check file
-  $path = tf_conf_get( 'application_path' ) . '/controller/' . $name . '.php';
+  $path = tf_conf_get('path', 'application') . '/controller/' . $name . '.php';
 
   // validate file existance
   if ( !file_exists( $path ) ) {
