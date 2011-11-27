@@ -1,5 +1,5 @@
                            Tlalokes Framework
-                           Version 2.0 (alpha)
+                              Version 2.0s
 
 Copyright (c) 2011 Basilio Briceno <bbh@tlalokes.org>
 
@@ -36,25 +36,26 @@ DOCUMENTATION
 
  When you check into Tlalokes 2.0, you will see this structure
 
- + framework. Contains the frameworks required files.
- + example. Contains an example of the structure required to use the framework.
-  \ htdocs. Contains the files to be exposed on the Web and the index file to load the framework
-   |- css
-   |- img
-   |- js
+ |- css
+ |- img
+ |- js
+ \ app
+  | framework. Contains the frameworks required files.
   \ application. This directory contains the structure of your application.
    | controller. Contains the classes used as controllers.
    \ model. Contains the files used as models.
-    |- business. Contains the files where the business logic must be allocated. 
-    |- vendor.
+    |- business. Contains the files where the business logic must be allocated.
+    |- vendor. Contains the business logic produced by vendors.
    \ view. Contains the views files and structure.
-    |- layout. Contains the layouts files used to display a view
-    |- block. Contains the blocks for the layouts.
-   \ _misc.
+    \ theme. Here yon can set your themes.
+     \ default. Default theme directory.
+      |- layout. Layouts files used in your theme to display a view
+      |- block. Blocks used in your theme's layouts.
+   \ _misc. Miscelaneous files
     |- locale.
-    |- lib.
-    |- sql.
-    |- tmp.
+    |- lib. Third party libraries.
+    |- sql. Your SQL files (remove this for production).
+    |- tmp. Any temporal file or log.
 
 IF SOMETHING GOES WRONG:
 
@@ -62,7 +63,7 @@ IF SOMETHING GOES WRONG:
 
 WARNING
 
-  2.0 alpha is a development version, right now is not for production.
+  2.0 alpha is a development version, test it and report :)
 
 CREDITS
 
