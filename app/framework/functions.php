@@ -28,6 +28,9 @@
  */
 function tf_init ( $application = false )
 {
+  // set short open tags <? as default
+  ini_set( 'short_open_tag', '1' );
+
   // init session
   session_start();
 
@@ -66,6 +69,9 @@ function tf_init ( $application = false )
   }
 
   require $application . '/config.php';
+
+  // set default timezone
+  date_default_timezone_set( $conf['default']['timezone'] );
 
   // load theme name
   $theme = tf_request( 'theme' ) ?
