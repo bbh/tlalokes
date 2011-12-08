@@ -43,7 +43,8 @@ class TlalokesDBConnection extends PDO {
                                 'host='.$dsn['host'].';'.
                                 'dbname='.$dsn['name'].';',
                                 $dsn['username'], $dsn['password'],
-                                $dsn['options'] );
+                                isset( $dsn['options'] ) ?
+                                $dsn['options'] : null );
   }
 
   /**
