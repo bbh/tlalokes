@@ -71,7 +71,7 @@ function tf_init ( $application = false )
   require $application . '/config.php';
 
   // set default timezone
-  date_default_timezone_set( $conf['default']['timezone'] );
+  date_default_timezone_set( $c['default']['timezone'] );
 
   // load theme name
   $theme = tf_request( 'theme' ) ?
