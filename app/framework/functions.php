@@ -521,20 +521,33 @@ function tf_db ( $dsn_name = 'default' )
     return false;
   }
 
-  if ( !isset( $GLOBALS['_REGISTRY']['db'][$dsn_name] ) ) {
+  if ( !isset( $GLOBALS['_REGISTRY']['conf']['db'][$dsn_name] ) ) {
 
     try {
 
       require_once 'classes.php';
 
-      if ( !isset( $GLOBALS['_REGISTRY']['db'] ) ) {
+      if ( !isset( $GLOBALS['_REGISTRY']['conf']['db'] ) ) {
 
         $GLOBALS['_REGISTRY']['db'] = array();
       }
 
-      $GLOBALS['_REGISTRY']['db'][$dsn_name] = new TlalokesDBConnection( $dsn );
+      // if driver is defined
+      if ( isset( $dsn['driver'] ) ) {
 
-    } catch ( PDOException $e ) {
+        // driver is mysqli
+        if ( $dsn['driver'] == 'mysqli' ) {
+
+          $GLOBALS['_REGISTRY']['db'][$dsn_name] = new TFMySQLi( $dsn );
+        }
+
+      // driver is PDO
+      } else {
+
+        $GLOBALS['_REGISTRY']['db'][$dsn_name] = new TlalokesDBConnection( $dsn );
+      }
+
+    } catch ( Exception $e ) {
 
       tf_error( '[Framework][DB] '.$e->getMessage() );
 
