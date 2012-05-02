@@ -25,9 +25,7 @@ class CrudExampleCtl {
   {
     require 'ExampleBss.php';
 
-    ExampleBss::read();
-
-    //tf_response_set( 'example', ExampleBss::getData() );
+    tf_response_set( 'example', ExampleBss::getData() );
   }
 
   /**

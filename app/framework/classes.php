@@ -27,7 +27,9 @@
  * @todo MORE CONTROL IN query() ERROR RESULT
  * @todo A SIMPLE WAY FOR TRANSACTIONAL SQL STATEMENTS
  */
-class TlalokesDBConnection extends PDO {
+class TFPDO extends PDO {
+
+  private $conn_name;
 
   /**
    * Creates a PDO instance representing a connection to a database
@@ -37,7 +39,9 @@ class TlalokesDBConnection extends PDO {
    * @return PDO Returns a PDO object on success.
    * @todo ADD CHARSET TO DSN
    */
-  public function __construct( array &$dsn ) {
+  public function __construct( array &$dsn, $name ) {
+
+    $this->conn_name = $name;
 
     return parent::__construct( $dsn['type'].':'.
                                 'host='.$dsn['host'].';'.
@@ -84,6 +88,13 @@ class TlalokesDBConnection extends PDO {
     }
 
     return $statament;
+  }
+
+  public function close ()
+  {
+    $GLOBALS['_REGISTRY']['db'][$this->conn_name] = null;
+
+    unset( $GLOBALS['_REGISTRY']['db'][$this->conn_name] );
   }
 }
 
@@ -148,12 +159,18 @@ class TFMySQLi extends mysqli {
 
       $rows = $result->fetch_all( MYSQLI_ASSOC );
 
+      $result->free();
+
       return $rows[0];
     }
 
     if ( $fetch ) {
 
-      return $result->fetch_all( MYSQLI_ASSOC );
+      $rows = $result->fetch_all( MYSQLI_ASSOC );
+
+      $result->free();
+
+      return $rows;
     }
 
     return $result;

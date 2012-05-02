@@ -544,7 +544,7 @@ function tf_db ( $dsn_name = 'default' )
       // driver is PDO
       } else {
 
-        $GLOBALS['_REGISTRY']['db'][$dsn_name] = new TlalokesDBConnection( $dsn );
+        $GLOBALS['_REGISTRY']['db'][$dsn_name] = new TFPDO( $dsn, $dsn_name );
       }
 
     } catch ( Exception $e ) {

@@ -13,15 +13,8 @@ class ExampleBss {
       return $result;
     }
 
+    $db->close();
+
     unset( $db );
-  }
-
-  public static function read ()
-  {
-    $db = tf_db( 'default' );
-
-    $sql = 'SELECT * FROM example';
-
-    var_dump( $db->query( $sql, true ) );
   }
 }
