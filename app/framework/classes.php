@@ -86,3 +86,76 @@ class TlalokesDBConnection extends PDO {
     return $statament;
   }
 }
+
+/**
+ * Class to connect to a database extending mysqli and provides custom features
+ *
+ * @author Basilio Briceno <bbh@tlalokes.org>
+ * @copyright Copyright (c) 2012, Basilio Briceno
+ * @license http://www.gnu.org/licenses/lgpl.html GNU LGPL
+ * @todo MORE CONTROL IN query() ERROR RESULT
+ * @todo A SIMPLE WAY FOR TRANSACTIONAL SQL STATEMENTS
+ */
+class TFMySQLi extends mysqli {
+
+  /**
+   * Creates a mysqli instance representing a connection to a database
+   *
+   * @author Basilio Briceno <bbh@tlalokes.org>
+   * @param array $dsn An array with DSN information
+   * @return mysqli Returns a mysqli object on success
+   */
+  public function __construct ( array &$dsn )
+  {
+    $conn = parent::mysqli( $dsn['host'], $dsn['username'], $dsn['password'],
+                            $dsn['name'] );
+
+    if ( mysqli_connect_errno( $this ) ) {
+
+      throw new Exception( "Failed to connect: " . mysqli_connect_error() );
+    }
+
+    return $conn;
+  }
+
+
+  /**
+   * Executes SQL statement, returns a mysqli_result object or Array if fetched
+   *
+   * @author Basilio Briceno <bbh@tlalokes.org>
+   * @param string $sql SQL statement
+   * @param boolean $fetch Flag to returns result as a fetched array
+   * @param boolean $one_row Flag to return only one fetched row array
+   * @return mixed mysqli_result object, fetched array, or FALSE on failure
+   */
+  public function query ( $sql, $fetch = false, $one_row = false )
+  {
+    if ( tf_request( 'debug' ) ) {
+
+      $start_time = microtime( true );
+    }
+
+    $result = parent::query( $sql );
+
+    if ( tf_request( 'debug' ) ) {
+
+      tf_log( 'SQL ['.round( $start_time - microtime( true ), 4 ).'s] '.$sql );
+
+      unset( $start_time );
+    }
+
+    if ( $one_row ) {
+
+      $rows = $result->fetch_all( MYSQLI_ASSOC );
+
+      return $rows[0];
+    }
+
+    if ( $fetch ) {
+
+      return $result->fetch_all( MYSQLI_ASSOC );
+    }
+
+    return $result;
+  }
+}
