@@ -339,7 +339,7 @@ function tf_view_block ( $block_name )
 {
   $path = tf_conf_get('path','theme') . '/block/';
 
-  $file = tf_conf_get('controller').'_'.$block_name.'_block.php';
+  $file = strtolower( tf_conf_get('controller') ).'_'.$block_name.'_block.php';
 
   if ( !file_exists( $path.$file ) ) {
 
@@ -347,7 +347,7 @@ function tf_view_block ( $block_name )
 
     if ( !file_exists( $path.$file ) ) {
 
-      tf_error( '[Framework][Block] File not found ('. $block_name .')' );
+      tf_error( '[Framework][Block] File not found ('. $file .')' );
 
       return;
     }
