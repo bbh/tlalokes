@@ -9,6 +9,7 @@ $c['default']['timezone'] = 'America/Monterrey';
 $c['default']['uploads'] = 'uploads/';
 // DSN
 $c['dsn']['default']['type'] = 'mysql';
+$c['dsn']['default']['driver'] = 'mysqli';
 $c['dsn']['default']['host'] = 'localhost';
 $c['dsn']['default']['name'] = 'tlalokes_test';
 $c['dsn']['default']['username'] = 'root';
