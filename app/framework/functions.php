@@ -78,10 +78,46 @@ function tf_init ( $application = false )
            $application . '/view/theme/' . tf_request( 'theme' ) :
            $application . '/view/theme/' . $c['default']['theme'];
 
-  // validate theme existance
-  if ( !file_exists( $theme ) ) {
+  // load modules
+  if ( isset( $c['module'] ) && is_array( $c['module'] ) ) {
 
-    tf_error( "[Framework] Theme ($theme) not found", true );
+    // iterate each module in the module's array
+    foreach ( $c['module'] as $name => $active ) {
+
+      // check if module must be active
+      if ( $active === true ) {
+
+        // check module existance
+        if ( !file_exists( $application . '/_misc/mod/'. $name ) ) {
+
+          tf_error( "[Framework] Module '$name' not found." );
+
+        } else {
+
+          $modules[$name] = $name;
+
+          $mod_path = $application . '/_misc/mod/'. $name;
+
+          $mods_inc = !isset( $mods_inc ) ? '' : $mods_inc;
+
+          $mods_inc .= PATH_SEPARATOR . $mod_path . '/controller' .
+                       PATH_SEPARATOR . $mod_path . '/model' .
+                       PATH_SEPARATOR . $mod_path . '/view';
+
+          unset( $mod_path );
+
+          tf_log( "Module $name is ready to load" );
+        }
+      }
+    }
+
+    // set modules enabled to configuration, to avoid recheck
+    if ( isset( $modules ) && is_array( $modules ) && $modules ) {
+
+      $GLOBALS['_REGISTRY']['modules_enabled'] = $modules;
+
+      unset( $modules );
+    }
   }
 
   // set configuration in global registry
@@ -94,7 +130,8 @@ function tf_init ( $application = false )
                            PATH_SEPARATOR . $application . '/view' .
                            PATH_SEPARATOR . $theme .
                            PATH_SEPARATOR . $application . '/_misc/locale' .
-                           PATH_SEPARATOR . $application . '/_misc/lib' );
+                           PATH_SEPARATOR . $application . '/_misc/lib' .
+                           isset( $mods_inc ) ? $mods_inc : $mods_inc );
 
   // set theme in configuration
   $GLOBALS['_REGISTRY']['conf']['path']['application'] = $application;
@@ -130,8 +167,6 @@ function tf_init ( $application = false )
     tf_log( 'Time: '. round( microtime( true ) - tf_conf_get('start_time'), 4 ).
             's, Memory: ' . memory_get_usage( true ) / 1024 . 'K' );
   }
-
-  //tf_registry_print( 'response' );
 
   tf_log_print();
 
@@ -337,7 +372,13 @@ function tf_crypt ( $string, $code = false )
  */
 function tf_view_block ( $block_name )
 {
-  $path = tf_conf_get('path','theme') . '/block/';
+  $path = tf_conf_get( 'path', 'theme' ) . '/block/';
+
+  // check if part of a module
+  if ( tf_is_a_module() ) {
+
+    $path = tf_conf_get( 'module_conf', 'theme' ) . '/block/';
+  }
 
   $file = strtolower( tf_conf_get('controller') ).'_'.$block_name.'_block.php';
 
@@ -453,9 +494,16 @@ function tf_view_load ()
 
     $path = tf_conf_get( 'path', 'theme' ) . '/layout/';
 
+    if ( tf_is_a_module() ) {
+
+      $path = tf_conf_get( 'module_conf', 'theme') . '/layout/';
+    }
+
+    // set the layout file name
     $file = tf_conf_get('controller').'_'.$annotation['Action']['layout'].
             '_layout.php';
 
+    // try to find the layout file
     if ( !file_exists( $path.$file ) ) {
 
       $file = tf_conf_get('controller').'_'.$annotation['Action']['layout'].
@@ -499,6 +547,40 @@ function tf_view_load ()
 
   unset( $path );
   unset( $file );
+}
+
+function tf_is_a_module ()
+{
+  // check if module has been already checked
+  if ( !tf_conf_get( 'module_conf' ) ) {
+
+    // if controller is part of a mudule load theme from that module
+    if ( $name = tf_conf_get( 'controller_module' ) ) {
+
+      $mod['path'] = tf_conf_get( 'path', 'application' ) .'/_misc/mod/'. $name;
+
+      require_once $mod['path'] . '/config.php';
+
+      $mod['theme'] = $mod['path'] .'/view/theme/'. $c['default']['theme'];
+
+      $mod['conf'] = $c;
+
+      unset( $c );
+
+      $GLOBALS['_REGISTRY']['conf']['module_conf'] = $mod;
+
+      unset( $mod );
+
+      return true;
+    }
+
+  // if module has been already checked
+  } else {
+
+     return true;
+  }
+
+  return false;
 }
 
 /**
@@ -610,10 +692,38 @@ function tf_controller_load ()
   $name = tf_strlow_to_camel( tf_conf_get( 'controller' ) ) . 'Ctl';
 
   // set absolute path to check file
-  $path = tf_conf_get('path', 'application') . '/controller/' . $name . '.php';
+  $app = tf_conf_get( 'path', 'application');
 
-  // validate file existance
-  if ( !file_exists( $path ) ) {
+  // validate controller file existance
+  if ( !file_exists( $app . '/controller/' . $name . '.php' ) ) {
+
+    // validate if controller file exists in a enabled module
+    $modules = $GLOBALS['_REGISTRY' ]['modules_enabled'];
+
+    if ( is_array( $modules ) ) {
+
+      foreach ( $modules as $module ) {
+
+        $ctlr = $app .'/_misc/mod/'. $module . '/controller/'. $name .'.php';
+
+        if ( file_exists( $ctlr ) ) {
+
+          $GLOBALS['_REGISTRY']['conf']['controller_module'] = $module;
+
+          $path = $ctlr;
+
+          unset( $ctlr );
+
+          break;
+        }
+
+        unset( $ctlr );
+      }
+    }
+  }
+
+  // validate controller existance
+  if ( !isset( $path ) ) {
 
     tf_error( "[Framework] Controller ($name) not found", true );
   }

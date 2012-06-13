@@ -1,7 +1,7 @@
 <?php
 $c = array();
 // Default
-$c['default']['controller'] = 'default';
+$c['default']['controller'] = 'example';
 $c['default']['theme'] = 'default';
 $c['default']['locale'] = 'eng';
 $c['default']['charset'] = 'utf8';
@@ -15,5 +15,3 @@ $c['dsn']['default']['name'] = 'tlalokes_test';
 $c['dsn']['default']['username'] = 'root';
 $c['dsn']['default']['password'] = '';
 $c['dsn']['default']['options'] = null;
-// Module
-$c['module']['example'] = true;
