@@ -592,7 +592,6 @@ function tf_is_a_module ()
 
       unset( $c );
 
-      //$GLOBALS['_REGISTRY']['conf']['module_conf'] = $mod;
       tf_conf_set( 'module_conf', $mod );
 
       unset( $mod );
@@ -652,8 +651,6 @@ function tf_db ( $dsn_name = 'default' )
 
         // driver is mysqli
         if ( $dsn['driver'] == 'mysqli' ) {
-
-          var_dump( $dsn );
 
           $GLOBALS['_REGISTRY']['db'][$dsn_name] = new TFMySQLi( $dsn );
         }
