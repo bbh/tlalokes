@@ -459,9 +459,26 @@ function tf_view_load ()
   if ( isset( $annotation['Action']['file'] ) &&
        !isset( $annotation['Action']['layout'] ) ) {
 
-    tf_log( 'Template: Loading '.$annotation['Action']['file'] );
+    tf_log( 'Template: Loading '. $annotation['Action']['file'] );
 
-    $path = tf_conf_get( 'path', 'theme' ) . '/';
+    // if loading a module, load view from that module
+    if ( tf_is_a_module() ) {
+
+      foreach( tf_conf_get( 'module' ) as $name => $active ) {
+
+        if ( $active === true ) {
+
+          tf_log( 'Template: Module view ' . $name );
+
+          $path = tf_conf_get( 'module_conf', 'theme' ) . '/';
+        }
+      }
+
+    // if not a module load from application's view
+    } else {
+
+      $path = tf_conf_get( 'path', 'theme' ) . '/';
+    }
 
     $file = tf_conf_get('controller').'_'.$annotation['Action']['file'].'.php';
 
@@ -480,7 +497,7 @@ function tf_view_load ()
           if ( !file_exists( $path . $file ) ) {
 
             tf_error( '[Framework][Template] File not found ('.
-                      $annotation['Action']['file'] .')', true );
+                      $path . $annotation['Action']['file'] .')', true );
           }
         }
       }
@@ -549,6 +566,14 @@ function tf_view_load ()
   unset( $file );
 }
 
+/**
+ * Confirms if the controller it's been loaded from a module
+ *
+ * @author Basilio Briceno <basilio@tlalokes.org>
+ * @copyright Copyright (c) 2011, Basilio Briceno
+ * @license http://www.gnu.org/licenses/lgpl.html GNU LGPL
+ * @return boolean
+ */
 function tf_is_a_module ()
 {
   // check if module has been already checked
@@ -567,7 +592,8 @@ function tf_is_a_module ()
 
       unset( $c );
 
-      $GLOBALS['_REGISTRY']['conf']['module_conf'] = $mod;
+      //$GLOBALS['_REGISTRY']['conf']['module_conf'] = $mod;
+      tf_conf_set( 'module_conf', $mod );
 
       unset( $mod );
 
@@ -594,7 +620,14 @@ function tf_is_a_module ()
  */
 function tf_db ( $dsn_name = 'default' )
 {
-  $dsn = tf_conf_get( 'dsn', $dsn_name );
+  if ( tf_is_a_module() ) {
+
+    $dsn = tf_conf_get( 'module_conf', 'dsn' );
+
+  } else {
+
+    $dsn = tf_conf_get( 'dsn', $dsn_name );
+  }
 
   if ( !$dsn ) {
 
@@ -619,6 +652,8 @@ function tf_db ( $dsn_name = 'default' )
 
         // driver is mysqli
         if ( $dsn['driver'] == 'mysqli' ) {
+
+          var_dump( $dsn );
 
           $GLOBALS['_REGISTRY']['db'][$dsn_name] = new TFMySQLi( $dsn );
         }

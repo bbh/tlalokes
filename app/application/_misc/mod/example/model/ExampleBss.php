@@ -10,10 +10,10 @@ class ExampleBss {
 
       $result = $db->query( 'SELECT * FROM example', true, true );
 
+      $db->close();
+
       return $result;
     }
-
-    $db->close();
 
     unset( $db );
   }

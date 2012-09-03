@@ -1,7 +1,7 @@
 <?php
 $c = array();
 // Default
-$c['default']['controller'] = 'default';
+$c['default']['controller'] = 'example';
 $c['default']['theme'] = 'default';
 $c['default']['locale'] = 'eng';
 $c['default']['charset'] = 'utf8';

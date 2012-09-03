@@ -1,8 +1,8 @@
 <?php
 /**
- * Example to ilustrate how Tlalokes 2 works
+ * Example to ilustrate how TF2 works
  *
- * @Controller( default='helloWorld' )
+ * @Controller( default='hello_world' )
  */
 class ExampleCtl {
 
@@ -11,7 +11,7 @@ class ExampleCtl {
    *
    * @Action( file='example_hello' )
    */
-  public function helloWorld ()
+  public function hello_world ()
   {
     tf_response_set( 'hello_world', 'Hello World' );
   }
@@ -21,7 +21,7 @@ class ExampleCtl {
    *
    * @Action( layout='example', zone='content:data' )
    */
-  public function getDataFromDB ( )
+  public function get_data_from_db ( )
   {
     require 'ExampleBss.php';
 
