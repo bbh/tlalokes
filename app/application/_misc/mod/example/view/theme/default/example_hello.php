@@ -6,7 +6,7 @@
 
   <body>
 
-    <h1><?php echo tf_response('hello_world');?></h1>
+    <h1><?__( 'hello_world' );?></h1>
 
   </body>
 

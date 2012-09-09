@@ -1,6 +1,6 @@
-DROP SCHEMA IF EXISTS `tlalokes_test`;
-CREATE SCHEMA IF NOT EXISTS `tlalokes_test` CHARACTER SET=`utf8` COLLATE=`utf8_general_ci`;
-USE `tlalokes_test`;
+DROP SCHEMA IF EXISTS `tf_example`;
+CREATE SCHEMA IF NOT EXISTS `tf_example` CHARACTER SET=`utf8` COLLATE=`utf8_general_ci`;
+USE `tf_example`;
 
 CREATE TABLE `example` (
 

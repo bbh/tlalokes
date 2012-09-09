@@ -39,16 +39,14 @@ class TFPDO extends PDO {
    * @return PDO Returns a PDO object on success.
    * @todo ADD CHARSET TO DSN
    */
-  public function __construct( array &$dsn, $name ) {
-
+  public function __construct ( array &$dsn, $name )
+  {
     $this->conn_name = $name;
 
-    return parent::__construct( $dsn['type'].':'.
-                                'host='.$dsn['host'].';'.
+    return parent::__construct( $dsn['type'].':host='.$dsn['host'].';'.
                                 'dbname='.$dsn['name'].';',
                                 $dsn['username'], $dsn['password'],
-                                isset( $dsn['options'] ) ?
-                                $dsn['options'] : null );
+                                isset( $dsn['options'] ) ? $dsn['options'] : null );
   }
 
   /**
@@ -62,14 +60,14 @@ class TFPDO extends PDO {
    */
   public function query ( $sql, $fetch = false, $one_row = false )
   {
-    if ( tf_request( 'debug' ) ) {
+    if ( request( 'debug' ) ) {
 
       $start_time = microtime( true );
     }
 
     $statament = parent::query( $sql );
 
-    if ( tf_request( 'debug' ) ) {
+    if ( request( 'debug' ) ) {
 
       tf_log( 'SQL ['.round( $start_time - microtime( true ), 4 ).'s] '.$sql );
       unset( $start_time );
@@ -141,14 +139,14 @@ class TFMySQLi extends mysqli {
    */
   public function query ( $sql, $fetch = false, $one_row = false )
   {
-    if ( tf_request( 'debug' ) ) {
+    if ( request( 'debug' ) ) {
 
       $start_time = microtime( true );
     }
 
     $result = parent::query( $sql );
 
-    if ( tf_request( 'debug' ) ) {
+    if ( request( 'debug' ) ) {
 
       tf_log( 'SQL ['.round( $start_time - microtime( true ), 4 ).'s] '.$sql );
 

@@ -18,6 +18,8 @@
  * along with this file. If not, see <http://www.gnu.org/licenses/lgpl.html>.
  */
 
+define( 'RESPONSE_GET', -1.83590753637 );
+
 /**
  * Loads Tlalokes framework
  *
@@ -74,8 +76,8 @@ function tf_init ( $application = false )
   date_default_timezone_set( $c['default']['timezone'] );
 
   // load theme name
-  $theme = tf_request( 'theme' ) ?
-           $application . '/view/theme/' . tf_request( 'theme' ) :
+  $theme = request( 'theme' ) ?
+           $application . '/view/theme/' . request( 'theme' ) :
            $application . '/view/theme/' . $c['default']['theme'];
 
   // load modules
@@ -145,10 +147,10 @@ function tf_init ( $application = false )
   }
 
   // load controller
-  if ( !$controller = tf_request( 'controller' ) ) {
+  if ( !$controller = request( 'controller' ) ) {
 
     // load default controller
-    if ( !$controller = tf_conf_get( 'default', 'controller' ) ) {
+    if ( !$controller = conf_get( 'default', 'controller' ) ) {
 
       tf_error( "[Framework] Controller name required", true );
     }
@@ -164,7 +166,7 @@ function tf_init ( $application = false )
 
   if ( isset( $GLOBALS['_REGISTRY']['request']['debug'] ) ) {
 
-    tf_log( 'Time: '. round( microtime( true ) - tf_conf_get('start_time'), 4 ).
+    tf_log( 'Time: '. round( microtime( true ) - conf_get('start_time'), 4 ).
             's, Memory: ' . memory_get_usage( true ) / 1024 . 'K' );
   }
 
@@ -372,15 +374,15 @@ function tf_crypt ( $string, $code = false )
  */
 function tf_view_block ( $block_name )
 {
-  $path = tf_conf_get( 'path', 'theme' ) . '/block/';
+  $path = conf_get( 'path', 'theme' ) . '/block/';
 
   // check if part of a module
   if ( tf_is_a_module() ) {
 
-    $path = tf_conf_get( 'module_conf', 'theme' ) . '/block/';
+    $path = conf_get( 'module_conf', 'theme' ) . '/block/';
   }
 
-  $file = strtolower( tf_conf_get('controller') ).'_'.$block_name.'_block.php';
+  $file = strtolower( conf_get('controller') ).'_'.$block_name.'_block.php';
 
   if ( !file_exists( $path.$file ) ) {
 
@@ -409,7 +411,7 @@ function tf_view_block ( $block_name )
  */
 function tf_view_zone ( $zone_name )
 {
-  $annotation = tf_conf_get( 'action_annotation' );
+  $annotation = conf_get( 'action_annotation' );
 
   if ( isset( $annotation['Action']['zone'] ) ) {
 
@@ -447,7 +449,7 @@ function tf_view_load ()
   ini_set( 'short_open_tag', '1' );
 
   // get action's annotations
-  $annotation = tf_conf_get( 'action_annotation' );
+  $annotation = conf_get( 'action_annotation' );
 
   if ( !isset( $annotation['Action']['file'] ) &&
        !isset( $annotation['Action']['layout'] ) ) {
@@ -464,27 +466,27 @@ function tf_view_load ()
     // if loading a module, load view from that module
     if ( tf_is_a_module() ) {
 
-      foreach( tf_conf_get( 'module' ) as $name => $active ) {
+      foreach( conf_get( 'module' ) as $name => $active ) {
 
         if ( $active === true ) {
 
           tf_log( 'Template: Module view ' . $name );
 
-          $path = tf_conf_get( 'module_conf', 'theme' ) . '/';
+          $path = conf_get( 'module_conf', 'theme' ) . '/';
         }
       }
 
     // if not a module load from application's view
     } else {
 
-      $path = tf_conf_get( 'path', 'theme' ) . '/';
+      $path = conf_get( 'path', 'theme' ) . '/';
     }
 
-    $file = tf_conf_get('controller').'_'.$annotation['Action']['file'].'.php';
+    $file = conf_get('controller').'_'.$annotation['Action']['file'].'.php';
 
     if ( !file_exists( $path.$file ) ) {
 
-      $file = tf_conf_get('controller').'_'.$annotation['Action']['file'].'.tpl';
+      $file = conf_get('controller').'_'.$annotation['Action']['file'].'.tpl';
 
       if ( !file_exists( $path.$file ) ) {
 
@@ -509,21 +511,21 @@ function tf_view_load ()
   // load layout
   if ( isset( $annotation['Action']['layout'] ) ) {
 
-    $path = tf_conf_get( 'path', 'theme' ) . '/layout/';
+    $path = conf_get( 'path', 'theme' ) . '/layout/';
 
     if ( tf_is_a_module() ) {
 
-      $path = tf_conf_get( 'module_conf', 'theme') . '/layout/';
+      $path = conf_get( 'module_conf', 'theme') . '/layout/';
     }
 
     // set the layout file name
-    $file = tf_conf_get('controller').'_'.$annotation['Action']['layout'].
+    $file = conf_get('controller').'_'.$annotation['Action']['layout'].
             '_layout.php';
 
     // try to find the layout file
     if ( !file_exists( $path.$file ) ) {
 
-      $file = tf_conf_get('controller').'_'.$annotation['Action']['layout'].
+      $file = conf_get('controller').'_'.$annotation['Action']['layout'].
               '_layout.tpl';
 
       if ( !file_exists( $path.$file ) ) {
@@ -577,12 +579,12 @@ function tf_view_load ()
 function tf_is_a_module ()
 {
   // check if module has been already checked
-  if ( !tf_conf_get( 'module_conf' ) ) {
+  if ( !conf_get( 'module_conf' ) ) {
 
     // if controller is part of a mudule load theme from that module
-    if ( $name = tf_conf_get( 'controller_module' ) ) {
+    if ( $name = conf_get( 'controller_module' ) ) {
 
-      $mod['path'] = tf_conf_get( 'path', 'application' ) .'/_misc/mod/'. $name;
+      $mod['path'] = conf_get( 'path', 'application' ) .'/_misc/mod/'. $name;
 
       require_once $mod['path'] . '/config.php';
 
@@ -621,49 +623,50 @@ function tf_db ( $dsn_name = 'default' )
 {
   if ( tf_is_a_module() ) {
 
-    $dsn = tf_conf_get( 'module_conf', 'dsn' );
+    $dsn = conf_get( 'module_conf', 'conf' );
+    $dsn = $dsn['dsn'];
 
   } else {
 
-    $dsn = tf_conf_get( 'dsn', $dsn_name );
+    $dsn = conf_get( 'dsn', $dsn_name );
   }
 
   if ( !$dsn ) {
 
-    tf_error( '[Framework][DB] Provide a valid DSN name' );
+    tf_error( '[Database] Provide a valid DSN name' );
 
     return false;
   }
 
-  if ( !isset( $GLOBALS['_REGISTRY']['conf']['db'][$dsn_name] ) ) {
+  if ( !isset( $GLOBALS['_REGISTRY']['db'][$dsn_name] ) ) {
 
     try {
 
       require_once 'classes.php';
 
-      if ( !isset( $GLOBALS['_REGISTRY']['conf']['db'] ) ) {
+      if ( !isset( $dsn ) ) {
 
         $GLOBALS['_REGISTRY']['db'] = array();
       }
 
       // if driver is defined
-      if ( isset( $dsn['driver'] ) ) {
+      if ( isset( $dsn[$dsn_name]['driver'] ) ) {
 
         // driver is mysqli
-        if ( $dsn['driver'] == 'mysqli' ) {
+        if ( $dsn[$dsn_name]['driver'] == 'mysqli' ) {
 
-          $GLOBALS['_REGISTRY']['db'][$dsn_name] = new TFMySQLi( $dsn );
+          $GLOBALS['_REGISTRY']['db'][$dsn_name] = new TFMySQLi( $dsn[$dsn_name] );
         }
 
       // driver is PDO
       } else {
 
-        $GLOBALS['_REGISTRY']['db'][$dsn_name] = new TFPDO( $dsn, $dsn_name );
+        $GLOBALS['_REGISTRY']['db'][$dsn_name] = new TFPDO( $dsn[$dsn_name], $dsn_name );
       }
 
     } catch ( Exception $e ) {
 
-      tf_error( '[Framework][DB] '.$e->getMessage() );
+      tf_error( '[Database] '.$e->getMessage() );
 
       return false;
     }
@@ -673,41 +676,54 @@ function tf_db ( $dsn_name = 'default' )
 }
 
 /**
- * Returns a value from the response registry
+ * Prints the value from the response registry
  *
  * @author Basilio Briceno <bbh@tlalokes.org>
- * @copyright Copyright (c) 2011, Basilio Briceno
+ * @copyright Copyright (c) 2012, Basilio Briceno
  * @license http://www.gnu.org/licenses/lgpl.html GNU LGPL
  * @param string $name Name of the variable
  * @return mixed The value from response registry
  */
-function tf_response ( $name )
+function __ ( $name )
 {
-  if ( !isset( $GLOBALS['_REGISTRY']['response'][$name] ) ) {
+  $response =& response( $name );
 
-    return false;
-  }
+  echo !$response ? null : $response;
 
-  return $GLOBALS['_REGISTRY']['response'][$name];
+  unset( $response );
 }
 
 /**
- * Sets a value into response registry
+ * Sets or gets a value in response registry
  *
  * @author Basilio Briceno <bbh@tlalokes.org>
- * @copyright Copyright (c) 2011, Basilio Briceno
+ * @copyright Copyright (c) 2012, Basilio Briceno
  * @license http://www.gnu.org/licenses/lgpl.html GNU LGPL
  * @param string $name Name of variable
  * @param mixed $value Value of variable
  */
-function tf_response_set ( $name, $value )
+function response ( $name, $value = RESPONSE_GET )
 {
-  if ( !isset( $GLOBALS['_REGISTRY']['response'] ) ) {
+  if ( $value == RESPONSE_GET ) {
 
-    $GLOBALS['_REGISTRY']['response'] = array();
+    if ( !isset( $GLOBALS['_REGISTRY']['response'][$name] ) ) {
+
+      tf_log( '[Response] Cannot found variable '.$name );
+
+      return false;
+    }
+
+    return $GLOBALS['_REGISTRY']['response'][$name];
+
+  } else {
+
+    if ( !isset( $GLOBALS['_REGISTRY']['response'] ) ) {
+
+      $GLOBALS['_REGISTRY']['response'] = array();
+    }
+
+    $GLOBALS['_REGISTRY']['response'][$name] = $value;
   }
-
-  $GLOBALS['_REGISTRY']['response'][$name] = $value;
 }
 
 /**
@@ -721,10 +737,10 @@ function tf_response_set ( $name, $value )
 function tf_controller_load ()
 {
   // transform controller name from this_example to ThisExample
-  $name = tf_strlow_to_camel( tf_conf_get( 'controller' ) ) . 'Ctl';
+  $name = tf_strlow_to_camel( conf_get( 'controller' ) ) . 'Ctl';
 
   // set absolute path to check file
-  $app = tf_conf_get( 'path', 'application');
+  $app = conf_get( 'path', 'application');
 
   // validate controller file existance
   if ( !file_exists( $app . '/controller/' . $name . '.php' ) ) {
@@ -757,7 +773,7 @@ function tf_controller_load ()
   // validate controller existance
   if ( !isset( $path ) ) {
 
-    tf_error( "[Framework] Controller ($name) not found", true );
+    tf_error( "[Controller] Controller $name not found", true );
   }
 
   // load controller
@@ -765,7 +781,7 @@ function tf_controller_load ()
 
   unset( $path );
 
-  tf_log( "Controller: ($name) loaded" );
+  tf_log( "Controller $name loaded" );
 
   // reflect class to get annotations
   $reflection = new ReflectionClass( $name );
@@ -773,14 +789,14 @@ function tf_controller_load ()
   // validate docComment block existance
   if ( !$doc = $reflection->getDocComment() ) {
 
-    tf_error( "[Framework] No DocComment block found in controller ($name)" );
+    tf_error( "[Controller] No DocComment block found in controller $name" );
 
   // parse docComment block
   } else {
 
     if ( !$annotation = tf_annotation_parser( $doc ) ) {
 
-      tf_error( "[Framework] There aren't annotations in controller ($name)" );
+      tf_error( "[Controller] There are not annotations in controller $name" );
     }
   }
 
@@ -795,12 +811,12 @@ function tf_controller_load ()
   }
 
   // load action
-  if ( !$action = tf_request( 'action' ) ) {
+  if ( !$action = request( 'action' ) ) {
 
     // check default action
     if ( !isset( $annotation['Controller']['default'] ) ) {
 
-      tf_error( "[Framework] Action name required", true );
+      tf_error( "[Controller] Action name required", true );
     }
 
     // set default action
@@ -816,7 +832,7 @@ function tf_controller_load ()
 
     if ( !$reflection->hasMethod( $action ) ) {
 
-      tf_error( "[Framework] Action ($action) not found", true );
+      tf_error( "[Action] $action not found", true );
     }
   }
 
@@ -824,14 +840,14 @@ function tf_controller_load ()
 
   if ( !$doc = $reflection->getMethod( $action )->getDocComment() ) {
 
-    tf_error( "[Framework] No DocComment block found in action ($action)" );
+    tf_error( "[Action] No DocComment block found in action $action" );
 
   // parse docComment block
   } else {
 
     if ( !$annotation = tf_annotation_parser( $doc ) ) {
 
-      tf_error( "[Framework] There aren't annotations in action ($action)" );
+      tf_error( "[Action] There are not annotations in action $action" );
     }
   }
 
@@ -917,11 +933,11 @@ function tf_conf_set ( $name, $value )
  * @param string $name Name of the node
  * @param string $subnode Subnode name to return
  */
-function tf_conf_get ( $name, $subnode = false )
+function conf_get ( $name, $subnode = false )
 {
   if ( !isset( $GLOBALS['_REGISTRY']['conf'][$name] ) ) {
 
-    tf_error( "[Framework] Variable '$name' doesn't exists in configuration" );
+    tf_error( "[Registry] Variable $name does not exists in configuration" );
 
     return false;
   }
@@ -930,7 +946,7 @@ function tf_conf_get ( $name, $subnode = false )
 
     if ( !isset( $GLOBALS['_REGISTRY']['conf'][$name][$subnode] ) ) {
 
-      tf_error( "[Framework] Variable '$name'.'$subnode' doesn't exists" );
+      tf_error( "[Registry] SubVariable $name.$subnode does not exists" );
 
       return false;
     }
@@ -1002,7 +1018,7 @@ function tf_log_print ( $force = false )
  * @param boolean Flag to sanitize value, default is false
  * @todo SANITIZE VALUE
  */
-function tf_request ( $var_name, $satinize = false )
+function request ( $var_name, $satinize = false )
 {
   if ( isset( $GLOBALS['_REGISTRY']['request'][$var_name] ) &&
        $GLOBALS['_REGISTRY']['request'][$var_name] ) {
@@ -1200,7 +1216,7 @@ function tf_annotation_parser ( $doc )
  */
 function tf_fileup_save ( $input_name = 'all', $filter_rule = false )
 {
-  $path = realpath( '.' ) .'/'. tf_conf_get( 'default', 'uploads' );
+  $path = realpath( '.' ) .'/'. conf_get( 'default', 'uploads' );
 
   // check if _FILES contains an element
   if ( count( $_FILES ) < 1 ) {

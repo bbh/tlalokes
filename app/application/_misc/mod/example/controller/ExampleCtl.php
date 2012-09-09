@@ -13,7 +13,7 @@ class ExampleCtl {
    */
   public function hello_world ()
   {
-    tf_response_set( 'hello_world', 'Hello World' );
+    response( 'hello_world', 'Hello World' );
   }
 
   /**
@@ -25,15 +25,15 @@ class ExampleCtl {
   {
     require 'ExampleBss.php';
 
-    tf_response_set( 'example', ExampleBss::getData() );
+    response( 'example', ExampleBss::getData() );
   }
 
   /**
    * A simple sum without View layer
    */
-  public function sumThis ()
+  public function sum ()
   {
-    echo tf_request('val1') + tf_request('val2');
+    echo request( 'val1' ) + request( 'val2' );
   }
 
   /**
@@ -48,7 +48,7 @@ class ExampleCtl {
       if ( tf_fileup_save( 'myfile', array( 'type' => 'jpeg,png',
                                             'size' => 160383 ) ) ) {
 
-        tf_response_set( 'flag', true );
+        response( 'flag', true );
       }
     }
   }
