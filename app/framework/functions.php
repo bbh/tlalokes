@@ -125,6 +125,8 @@ function tf_init ( $application = false )
   // set configuration in global registry
   $GLOBALS['_REGISTRY']['conf'] = $c;
 
+  $mods_inc = isset( $mods_inc ) ? $mods_inc : '';
+
   // set include_path into environment
   ini_set( 'include_path', PATH_SEPARATOR . $application . '/controller' .
                            PATH_SEPARATOR . $application . '/model' .
@@ -133,7 +135,7 @@ function tf_init ( $application = false )
                            PATH_SEPARATOR . $theme .
                            PATH_SEPARATOR . $application . '/_misc/locale' .
                            PATH_SEPARATOR . $application . '/_misc/lib' .
-                           isset( $mods_inc ) ? $mods_inc : $mods_inc );
+                           $mods_inc );
 
   // set theme in configuration
   $GLOBALS['_REGISTRY']['conf']['path']['application'] = $application;
@@ -746,7 +748,8 @@ function tf_controller_load ()
   if ( !file_exists( $app . '/controller/' . $name . '.php' ) ) {
 
     // validate if controller file exists in a enabled module
-    $modules = $GLOBALS['_REGISTRY' ]['modules_enabled'];
+    $modules = isset( $GLOBALS['_REGISTRY' ]['modules_enabled'] )
+               ? $GLOBALS['_REGISTRY' ]['modules_enabled'] : false;
 
     if ( is_array( $modules ) ) {
 
