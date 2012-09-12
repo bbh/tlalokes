@@ -688,7 +688,7 @@ function tf_db ( $dsn_name = 'default' )
  */
 function __ ( $name )
 {
-  $response =& response( $name );
+  $response = response( $name );
 
   echo !$response ? null : $response;
 
