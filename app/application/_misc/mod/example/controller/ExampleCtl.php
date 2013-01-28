@@ -33,7 +33,7 @@ class ExampleCtl {
    */
   public function sum ()
   {
-    echo request( 'val1' ) + request( 'val2' );
+    echo request( 'val1' ) + request( 'val2' ), PHP_EOL;
   }
 
   /**
