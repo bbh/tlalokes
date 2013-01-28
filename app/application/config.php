@@ -9,29 +9,16 @@ $c['default']['locale'] = 'eng';
 $c['default']['charset'] = 'utf8';
 $c['default']['timezone'] = 'America/Monterrey';
 $c['default']['uploads'] = 'uploads/';
+$c['default']['environment'] = 'development';
 
-if ( !isset( $_ENV['application_environment'] ) ) {
-
-  tf_error( '[Configuration] Environment for application required', true );
-
-} else {
-
-  if ( $_ENV['application_environment'] == "development" ) {
-
-    // DSN
-    $c['dsn']['default']['type'] = 'mysql';
-    $c['dsn']['default']['driver'] = 'mysqli';
-    $c['dsn']['default']['host'] = 'localhost';
-    $c['dsn']['default']['name'] = 'tf_example';
-    $c['dsn']['default']['username'] = 'root';
-    $c['dsn']['default']['password'] = '';
-    $c['dsn']['default']['options'] = null;
-
-    // module example
-    $c['module']['example'] = true;
-
-  } else {
-
-    tf_error( '[Configuration] Enviroment for application not found', true );
-  }
-}
+// Environment
+// DSN
+$c['env']['development']['dsn']['default']['type'] = 'mysql';
+$c['env']['development']['dsn']['default']['driver'] = 'mysqli';
+$c['env']['development']['dsn']['default']['host'] = 'localhost';
+$c['env']['development']['dsn']['default']['name'] = 'tf_example';
+$c['env']['development']['dsn']['default']['username'] = 'root';
+$c['env']['development']['dsn']['default']['password'] = '';
+$c['env']['development']['dsn']['default']['options'] = null;
+// Module
+$c['env']['development']['module']['example'] = true;

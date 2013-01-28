@@ -72,6 +72,17 @@ function tf_init ( $application = false )
 
   require $application . '/config.php';
 
+  // load environment
+  if ( !isset( $_ENV['app_env'] ) ) {
+
+    if ( !isset( $c['default']['environment'] ) ) {
+
+      tf_error( '[Configuration] Environment for application required', true );
+    }
+
+    $_ENV['app_env'] = $c['default']['environment'];
+  }
+
   // set default timezone
   date_default_timezone_set( $c['default']['timezone'] );
 
@@ -81,46 +92,7 @@ function tf_init ( $application = false )
            $application . '/view/theme/' . $c['default']['theme'];
 
   // load modules
-  if ( isset( $c['module'] ) && is_array( $c['module'] ) ) {
-
-    // iterate each module in the module's array
-    foreach ( $c['module'] as $name => $active ) {
-
-      // check if module must be active
-      if ( $active === true ) {
-
-        // check module existance
-        if ( !file_exists( $application . '/_misc/mod/'. $name ) ) {
-
-          tf_error( "[Framework] Module '$name' not found." );
-
-        } else {
-
-          $modules[$name] = $name;
-
-          $mod_path = $application . '/_misc/mod/'. $name;
-
-          $mods_inc = !isset( $mods_inc ) ? '' : $mods_inc;
-
-          $mods_inc .= PATH_SEPARATOR . $mod_path . '/controller' .
-                       PATH_SEPARATOR . $mod_path . '/model' .
-                       PATH_SEPARATOR . $mod_path . '/view';
-
-          unset( $mod_path );
-
-          tf_log( "Module $name is ready to load" );
-        }
-      }
-    }
-
-    // set modules enabled to configuration, to avoid recheck
-    if ( isset( $modules ) && is_array( $modules ) && $modules ) {
-
-      $GLOBALS['_REGISTRY']['modules_enabled'] = $modules;
-
-      unset( $modules );
-    }
-  }
+  tf_load_modules( $c, $application );
 
   // set configuration in global registry
   $GLOBALS['_REGISTRY']['conf'] = $c;
@@ -177,6 +149,62 @@ function tf_init ( $application = false )
   unset( $GLOBALS['_REGISTRY'] );
 
   exit;
+}
+
+/**
+ * Load modules from configuration
+ *
+ * @author Basilio Briceno <bbh@tlalokes.org>
+ * @copyright Copyright (c) 2013, Basilio Briceno
+ * @license http://www.gnu.org/licenses/lgpl.html GNU LGPL
+ */
+function tf_load_modules ( &$c, &$application )
+{
+  if ( isset( $c['env'][$_ENV['app_env']]['module'] ) ) {
+
+    $c['module'] = $c['env'][$_ENV['app_env']]['module'];
+  }
+
+  if ( isset( $c['module'] ) && is_array( $c['module'] ) ) {
+
+    // iterate each module in the module's array
+    foreach ( $c['module'] as $name => $active ) {
+
+      // check if module must be active
+      if ( $active === true ) {
+
+        // check module existance
+        if ( !file_exists( $application . '/_misc/mod/'. $name ) ) {
+
+          tf_error( "[Framework] Module '$name' not found." );
+
+        } else {
+
+          $modules[$name] = $name;
+
+          $mod_path = $application . '/_misc/mod/'. $name;
+
+          $mods_inc = !isset( $mods_inc ) ? '' : $mods_inc;
+
+          $mods_inc .= PATH_SEPARATOR . $mod_path . '/controller' .
+                       PATH_SEPARATOR . $mod_path . '/model' .
+                       PATH_SEPARATOR . $mod_path . '/view';
+
+          unset( $mod_path );
+
+          tf_log( "Module $name is ready to load" );
+        }
+      }
+    }
+
+    // set modules enabled to configuration, to avoid recheck
+    if ( isset( $modules ) && is_array( $modules ) && $modules ) {
+
+      $GLOBALS['_REGISTRY']['modules_enabled'] = $modules;
+
+      unset( $modules );
+    }
+  }
 }
 
 /**

@@ -1,5 +1,7 @@
 <?php
+
 $c = array();
+
 // Default
 $c['default']['controller'] = 'example';
 $c['default']['theme'] = 'default';
@@ -7,11 +9,13 @@ $c['default']['locale'] = 'eng';
 $c['default']['charset'] = 'utf8';
 $c['default']['timezone'] = 'America/Monterrey';
 $c['default']['uploads'] = 'uploads/';
+
+// Environment
 // DSN
-$c['dsn']['default']['type'] = 'mysql';
-$c['dsn']['default']['driver'] = 'mysqli';
-$c['dsn']['default']['host'] = 'localhost';
-$c['dsn']['default']['name'] = 'tf_example';
-$c['dsn']['default']['username'] = 'root';
-$c['dsn']['default']['password'] = '';
-$c['dsn']['default']['options'] = null;
+$c['env']['development']['dsn']['default']['type'] = 'mysql';
+$c['env']['development']['dsn']['default']['driver'] = 'mysqli';
+$c['env']['development']['dsn']['default']['host'] = 'localhost';
+$c['env']['development']['dsn']['default']['name'] = 'tf_example';
+$c['env']['development']['dsn']['default']['username'] = 'root';
+$c['env']['development']['dsn']['default']['password'] = '';
+$c['env']['development']['dsn']['default']['options'] = null;
