@@ -73,15 +73,7 @@ function tf_init ( $application = false )
   require $application . '/config.php';
 
   // load environment
-  if ( !isset( $_ENV['app_env'] ) ) {
-
-    if ( !isset( $c['default']['environment'] ) ) {
-
-      tf_error( '[Configuration] Environment for application required', true );
-    }
-
-    $_ENV['app_env'] = $c['default']['environment'];
-  }
+  tf_load_environment( $c );
 
   // set default timezone
   date_default_timezone_set( $c['default']['timezone'] );
@@ -149,6 +141,26 @@ function tf_init ( $application = false )
   unset( $GLOBALS['_REGISTRY'] );
 
   exit;
+}
+
+/**
+ * Load environment from configuration
+ *
+ * @author Basilio Briceno <bbh@tlalokes.org>
+ * @copyright Copyright (c) 2013, Basilio Briceno
+ * @license http://www.gnu.org/licenses/lgpl.html GNU LGPL
+ */
+function tf_load_environment ( &$c )
+{
+  if ( !isset( $_ENV['app_env'] ) ) {
+
+    if ( !isset( $c['default']['environment'] ) ) {
+
+      tf_error( '[Configuration] Environment for application required', true );
+    }
+
+    $_ENV['app_env'] = $c['default']['environment'];
+  }
 }
 
 /**
