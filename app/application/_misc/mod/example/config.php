@@ -12,10 +12,10 @@ $c['default']['uploads'] = 'uploads/';
 
 // Environment
 // DSN
-/*$c['env']['development']['dsn']['default']['type'] = 'mysql';
+$c['env']['development']['dsn']['default']['type'] = 'mysql';
 $c['env']['development']['dsn']['default']['driver'] = 'mysqli';
 $c['env']['development']['dsn']['default']['host'] = 'localhost';
 $c['env']['development']['dsn']['default']['name'] = 'tf_example';
 $c['env']['development']['dsn']['default']['username'] = 'root';
 $c['env']['development']['dsn']['default']['password'] = '';
-$c['env']['development']['dsn']['default']['options'] = null;*/
+$c['env']['development']['dsn']['default']['options'] = null;
