@@ -89,7 +89,13 @@ function tf_init ( $application = false )
   // set configuration in global registry
   $GLOBALS['_REGISTRY']['conf'] = $c;
 
-  $mods_inc = isset( $mods_inc ) ? $mods_inc : '';
+  // load include path from modules
+  if ( isset( $c['mods_inc'] ) ) {
+
+    $mods_inc = $c['mods_inc'];
+
+    unset( $c['mods_inc'] );
+  }
 
   // set include_path into environment
   ini_set( 'include_path', PATH_SEPARATOR . $application . '/controller' .
@@ -99,7 +105,7 @@ function tf_init ( $application = false )
                            PATH_SEPARATOR . $theme .
                            PATH_SEPARATOR . $application . '/_misc/locale' .
                            PATH_SEPARATOR . $application . '/_misc/lib' .
-                           $mods_inc );
+                           isset( $mods_inc ) ? $mods_inc : '' );
 
   // set theme in configuration
   $GLOBALS['_REGISTRY']['conf']['path']['application'] = $application;
@@ -152,14 +158,14 @@ function tf_init ( $application = false )
  */
 function tf_load_environment ( &$c )
 {
-  if ( !isset( $_ENV['app_env'] ) ) {
+  if ( !isset( $_ENV['APP_ENV'] ) ) {
 
     if ( !isset( $c['default']['environment'] ) ) {
 
       tf_error( '[Configuration] Environment for application required', true );
     }
 
-    $_ENV['app_env'] = $c['default']['environment'];
+    $_ENV['APP_ENV'] = $c['default']['environment'];
   }
 }
 
@@ -172,9 +178,9 @@ function tf_load_environment ( &$c )
  */
 function tf_load_modules ( &$c, &$application )
 {
-  if ( isset( $c['env'][$_ENV['app_env']]['module'] ) ) {
+  if ( isset( $c['env'][$_ENV['APP_ENV']]['module'] ) ) {
 
-    $c['module'] = $c['env'][$_ENV['app_env']]['module'];
+    $c['module'] = $c['env'][$_ENV['APP_ENV']]['module'];
   }
 
   if ( isset( $c['module'] ) && is_array( $c['module'] ) ) {
@@ -200,6 +206,7 @@ function tf_load_modules ( &$c, &$application )
 
           $mods_inc .= PATH_SEPARATOR . $mod_path . '/controller' .
                        PATH_SEPARATOR . $mod_path . '/model' .
+                       PATH_SEPARATOR . $mod_path . '/model/business' .
                        PATH_SEPARATOR . $mod_path . '/view';
 
           unset( $mod_path );
@@ -207,6 +214,14 @@ function tf_load_modules ( &$c, &$application )
           tf_log( "Module $name is ready to load" );
         }
       }
+    }
+
+    // set mods include path
+    if ( isset( $mods_inc ) ) {
+
+      $c['mods_inc'] = $mods_inc;
+
+      unset( $mods_inc );
     }
 
     // set modules enabled to configuration, to avoid recheck
@@ -663,14 +678,40 @@ function tf_is_a_module ()
  */
 function tf_db ( $dsn_name = 'default' )
 {
+  // it's a module
   if ( tf_is_a_module() ) {
 
-    $dsn = conf_get( 'module_conf', 'conf' );
-    $dsn = $dsn['dsn'];
+    // try to get DSN from module conf
+    $conf = conf_get( 'module_conf', 'conf' );
 
+    if ( isset( $conf['env'][$_ENV['APP_ENV']]['dsn'][$dsn_name] ) ) {
+
+      $dsn =  $conf['env'][$_ENV['APP_ENV']]['dsn'][$dsn_name] ;
+
+    // try to get DSN from app conf
+    } else {
+
+      $conf = conf_get( 'env', $_ENV['APP_ENV'] , 'dsn' );
+
+      if ( isset ( $conf['dsn'][$dsn_name] ) ) {
+
+        $dsn = $conf['dsn'][$dsn_name];
+      }
+    }
+
+    unset( $conf );
+
+  // not a module, get DSN from app conf
   } else {
 
-    $dsn = conf_get( 'dsn', $dsn_name );
+    $conf = conf_get( 'env', $_ENV['APP_ENV'] , 'dsn' );
+
+    if ( isset ( $conf['dsn'][$dsn_name] ) ) {
+
+      $dsn = $conf['dsn'][$dsn_name];
+    }
+
+    unset( $conf );
   }
 
   if ( !$dsn ) {
@@ -692,18 +733,18 @@ function tf_db ( $dsn_name = 'default' )
       }
 
       // if driver is defined
-      if ( isset( $dsn[$dsn_name]['driver'] ) ) {
+      if ( isset( $dsn['driver'] ) ) {
 
         // driver is mysqli
-        if ( $dsn[$dsn_name]['driver'] == 'mysqli' ) {
+        if ( $dsn['driver'] == 'mysqli' ) {
 
-          $GLOBALS['_REGISTRY']['db'][$dsn_name] = new TFMySQLi( $dsn[$dsn_name] );
+          $GLOBALS['_REGISTRY']['db'][$dsn_name] = new TFMySQLi( $dsn );
         }
 
       // driver is PDO
       } else {
 
-        $GLOBALS['_REGISTRY']['db'][$dsn_name] = new TFPDO( $dsn[$dsn_name], $dsn_name );
+        $GLOBALS['_REGISTRY']['db'][$dsn_name] = new TFPDO( $dsn, $dsn_name );
       }
 
     } catch ( Exception $e ) {

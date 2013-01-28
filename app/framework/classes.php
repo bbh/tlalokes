@@ -119,7 +119,7 @@ class TFMySQLi extends mysqli {
     $conn = parent::mysqli( $dsn['host'], $dsn['username'], $dsn['password'],
                             $dsn['name'] );
 
-    if ( mysqli_connect_errno( $this ) ) {
+    if ( mysqli_connect_errno( $conn ) ) {
 
       throw new Exception( "Failed to connect: " . mysqli_connect_error() );
     }
