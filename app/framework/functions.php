@@ -97,6 +97,8 @@ function tf_init ( $application = false )
     unset( $c['mods_inc'] );
   }
 
+  $modules_include_path = isset( $mods_inc ) ? $mods_inc : '';
+
   // set include_path into environment
   ini_set( 'include_path', PATH_SEPARATOR . $application . '/controller' .
                            PATH_SEPARATOR . $application . '/model' .
@@ -105,7 +107,7 @@ function tf_init ( $application = false )
                            PATH_SEPARATOR . $theme .
                            PATH_SEPARATOR . $application . '/_misc/locale' .
                            PATH_SEPARATOR . $application . '/_misc/lib' .
-                           isset( $mods_inc ) ? $mods_inc : '' );
+                           $modules_include_path );
 
   // set theme in configuration
   $GLOBALS['_REGISTRY']['conf']['path']['application'] = $application;
@@ -852,6 +854,9 @@ function tf_controller_load ()
         unset( $ctlr );
       }
     }
+  } else {
+
+    $path = $app . '/controller/' . $name . '.php';
   }
 
   // validate controller existance
